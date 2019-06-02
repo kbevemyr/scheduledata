@@ -6,7 +6,7 @@ import java.util.Comparator;
 
 public class TimeScheduleTable {
     private List<TimeScheduleEvent> data;
-    
+
     public TimeScheduleTable() {
 	data = new ArrayList<TimeScheduleEvent>();
     }
@@ -33,7 +33,7 @@ public class TimeScheduleTable {
 	}
     }
     private static boolean isKlass(String s) {
-	if(s.startsWith("P") || s.startsWith("F")) {
+	if(s.startsWith("P") || s.startsWith("F") || s.startsWith("M") || s.startsWith("K")) {
 	    return true;
 	} else {
 	    return false;
@@ -91,18 +91,24 @@ public class TimeScheduleTable {
 		}
 	    }
 	}
-		    
+
 	return status;
     }
 
 
     public String toString() {
-	String result = "";
-	
+      String START = "";
+      String SEP = "\n";
+      String END = "\n";
+
+      String result = START;
+
 	for(TimeScheduleEvent row : data) {
-	    result = result+row.toString();
+	    result = result+row.toString()+SEP;
 	}
-	
+
+  result = result+END;
+
 	return result;
     }
 
@@ -110,34 +116,44 @@ public class TimeScheduleTable {
      * Out format: Dag; Starttid(HH:MM); Klass; Gren;
      */
     public void printCVS() {
-	String result = "";
-	
+      String START = "";
+      String SEP = "\n";
+      String END = "\n";
+
+	String result = START;
+
 	for(int i=0; i<this.data.size()-1; i++) {
-	    if(!data.get(i).sameEvent(data.get(i+1))) {		
-		result = result+data.get(i).toCVS();
+	    if(!data.get(i).sameEvent(data.get(i+1))) {
+		result = result+data.get(i).toCVS()+SEP;
 	    }
 	}
-	result = result+data.get(this.data.size()-1).toCVS();
-	
-	System.out.println(result);	
+	result = result+data.get(this.data.size()-1).toCVS()+END;
+
+	System.out.println(result);
     }
 
     public void printJSON() {
+      String START = "[\n";
+      String SEP = ", \n";
+      String END = "]\n";
+
 	String days = "";
 	String arenas = "";
 	String events = "";
-	
+
+  String result = START;
+
 	for(int i=0; i<this.data.size()-1; i++) {
-	    if(!data.get(i).sameEvent(data.get(i+1))) {		
-		result = result+data.get(i).toCVS();
+	    if(!data.get(i).sameEvent(data.get(i+1))) {
+		result = result+data.get(i).toJSON()+SEP;
 	    }
 	}
-	result = result+data.get(this.data.size()-1).toCVS();
-	
-	System.out.println(result);	
+	result = result+data.get(this.data.size()-1).toJSON()+END;
+
+	System.out.println(result);
     }
 
-    
+
     public void sort() {
 	data.sort(Comparator.naturalOrder());
     }
@@ -165,12 +181,13 @@ public class TimeScheduleTable {
 	System.out.println("Health :\n"+abnormal.toString());
 	return response;
     }
-    
+
 
     public static void main(String [] args) {
 	DataLoader dl = new DataLoader();
 	TimeScheduleTable ts = new TimeScheduleTable();
 
+/*
 	// Orginalarket
 	String spreadsheetId = "1YgIgo1cpksh5ZklpVy6J3A46mBmgKJe-ix56f_n4Mzw";
 	//Katrins LABs version
@@ -180,11 +197,37 @@ public class TimeScheduleTable {
 	String techDataRangeL = "2018 Tidsprogram Lör!G3:M32";
 	String techDataRangeS = "2018 Tidsprogram Sön!G3:K33";
 
+  try {
+      ts.importRunData("lördag", dl.getData(spreadsheetId, runDataRangeL));
+      ts.importRunData("söndag", dl.getData(spreadsheetId, runDataRangeS));
+      ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeL));
+      ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeS));
+  } catch (IOException e) {
+      System.err.println("Unable to getData.");
+  }
+*/
+
+  // SAYO Outdoor 2019
+  String spreadsheetId = "1t1wx-Z743j8D83Acsl4XLswz3yJz-dYMtWTudK9X-nw";
+
+  String runDataRangeF = "Fredag 2019!A7:F18";
+  String runDataRangeL = "Lördag 2019!A3:F52";
+  String runDataRangeS = "Söndag 2019!A4:F36";
+  String techDataRangeF = "Fredag 2019!H2:N15";
+  String techDataRangeLv = "Lördag 2019!H2:O55";
+  String techDataRangeLs = "Lördag 2019!R2:S39";
+  String techDataRangeSv = "Söndag 2019!H2:M40";
+  String techDataRangeSs = "Söndag 2019!O2:P38";
+
 	try {
+      ts.importRunData("fredag", dl.getData(spreadsheetId, runDataRangeF));
 	    ts.importRunData("lördag", dl.getData(spreadsheetId, runDataRangeL));
 	    ts.importRunData("söndag", dl.getData(spreadsheetId, runDataRangeS));
-	    ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeL));
-	    ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeS));
+      ts.importTechData("fredag", dl.getData(spreadsheetId, techDataRangeF));
+	    ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeLv));
+      ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeLs));
+	    ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeSv));
+      ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeSs));
 	} catch (IOException e) {
 	    System.err.println("Unable to getData.");
 	}
@@ -192,11 +235,11 @@ public class TimeScheduleTable {
 	ts.sort();
 	System.out.println(ts.toString());
 
-	ts.printCVS();
+	ts.printJSON();
 
 	System.out.println(ts.healthCheck());
 
-	
+
 
 	/*
 	TimeScheduleEvent e1 = ts.getRow(3);

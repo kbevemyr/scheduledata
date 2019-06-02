@@ -38,6 +38,13 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
 	return startTime;
     }
 
+    public int getStartTimeInMinutes() {
+	LocalTime time = LocalTime.parse(startTime);
+	int hh = time.getHour();
+	int mm = time.getMinute();
+	return (hh*60)+mm;
+    }
+
     public String getKlass() {
 	return this.klass;
     }
@@ -55,10 +62,10 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
 	if(response == 0) {
 	    response = this.getStartTime().compareTo(other.getStartTime());
 	}
-					       
+
 	return response;
     }
-    
+
     public boolean importRunData(String d, List<Object> input) {
 	/*
 	  run row: [Starttid
@@ -88,7 +95,7 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
 		stallTid = parseRunDuration((String) input.get(5));
 	    }
 	    duration = (noHeat*heatTid)+stallTid;
-	    
+
 	    arena = "löpning";
 	    status = true;
 	}
@@ -145,7 +152,7 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
 	    LocalTime et1 = this.getEndTime();
 	    LocalTime st2 = LocalTime.parse(e.startTime);
 	    LocalTime et2 = e.getEndTime();
-	    
+
 	    if (st2.isAfter(st1) && st2.isBefore(et1)) {
 		response = true;
 	    }
@@ -153,23 +160,39 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
 		response = true;
 	    }
 	}
-	
+
 	return response;
     }
 
     public String toCVS() {
 	String START = "";
 	String SEP = "; ";
-	String END = "\n";
-	
+	String END = "";
+
 	return START+day+SEP+startTime+SEP+klass+SEP+gren+END;
+    }
+
+    private String q(String s) {
+	return "\""+s+"\"";
+    }
+
+    public String toJSON() {
+  String START = "{";
+  String SEP = ", ";
+  String END = "}";
+  String Q = "\"";
+
+  String stm = Integer.toString(this.getStartTimeInMinutes());
+
+//{"id": "100", "day": "1", arena: "kula", "starttime": 0, "duration": 15, "class": "M", "gren": "400m fö"}
+  return START+"id: "+q(klass+gren)+SEP+"day: "+q(day)+SEP+"arena: "+q(arena)+SEP+"starttime: "+q(stm)+SEP+"duration: "+Q+duration+Q+SEP+"class: "+q(klass)+SEP+"gren: "+q(gren)+END;
     }
 
     public String toString() {
 	String START = "";
 	String SEP = "; ";
-	String END = "\n";
-	
+	String END = "";
+
 	return START+arena+SEP+day+SEP+startTime+SEP+klass+SEP+gren+SEP+duration+END;
     }
 
@@ -181,4 +204,3 @@ public class TimeScheduleEvent implements Comparable<TimeScheduleEvent>{
     }
 
 }
-
