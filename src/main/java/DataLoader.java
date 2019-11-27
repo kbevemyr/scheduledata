@@ -81,6 +81,7 @@ public class DataLoader {
     }
 
     public List<List<Object>> getData(String s, String r) throws IOException {
+	System.out.println("getData "+s);
 	ValueRange response = service.spreadsheets().values()
                 .get(s, r)
                 .execute();
@@ -93,12 +94,20 @@ public class DataLoader {
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
 	DataLoader dl = new DataLoader();
-
+	/*
 	String spreadsheetId = "1YgIgo1cpksh5ZklpVy6J3A46mBmgKJe-ix56f_n4Mzw";
 	String runDataRangeL = "2018 Tidsprogram Lör!A3:F35";
 	String techDataRangeL = "2018 Tidsprogram Lör!G3:M35";
 	String runDataRangeS = "2018 Tidsprogram Sön!A3:F33";
 	String techDataRangeS = "2018 Tidsprogram Sön!G3:K33";
+	*/
+
+	
+	String spreadsheetId = "11i9JCTsDwCnt3mZgRzMnbc7gr4DAJWUzH84aolhU-2c";
+	String runDataRangeL = "2019 Tidsprogram Lör!A5:F34";
+	String techDataRangeL = "2019 Tidsprogram Lör!G5:M30";
+	String runDataRangeS = "2019 Tidsprogram Sön!A7:F32";
+	String techDataRangeS = "2019 Tidsprogram Sön!G5:K32";
 
 	dl.getData(spreadsheetId, runDataRangeL);
 	dl.getData(spreadsheetId, techDataRangeL);
@@ -108,3 +117,5 @@ public class DataLoader {
     }
 	
 }
+
+

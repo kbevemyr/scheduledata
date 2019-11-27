@@ -20,6 +20,7 @@ public class TimeScheduleTable {
     }
 
     public void importRunData(String day, List<List<Object>> values) {
+	int i = 0;
         if (values == null || values.isEmpty()) {
             System.out.println("No data found.");
 	} else {
@@ -28,10 +29,13 @@ public class TimeScheduleTable {
 		    TimeScheduleEvent e = new TimeScheduleEvent();
 		    e.importRunData(day, row);
 		    data.add(e);
+		    System.out.print(i+" "); i++;
 		}
 	    }
 	}
+	System.out.println("done runinput");
     }
+    
     private static boolean isKlass(String s) {
 	if(s.startsWith("P") || s.startsWith("F") || s.startsWith("M") || s.startsWith("K")) {
 	    return true;
@@ -68,6 +72,14 @@ public class TimeScheduleTable {
 	} else {
 	    Object[] arenas = input.get(0).toArray();
 	    int noArenas = arenas.length;
+
+	    /*
+	    System.out.println("Arenas: "+noArenas);
+	    for(int y=1; y < noArenas; y++) {
+		System.out.println("A. "+arenas[y]);
+	    }
+	    */
+		    
 	    for(int i=1; i < input.size()-1; i++) { //forall rows
 		//System.out.println("processing "+input.get(i));
 		for(int j=1; j < input.get(i).size(); j++) { //forall arenas available
@@ -85,13 +97,16 @@ public class TimeScheduleTable {
 								    arenainfo,
 								    calcGren((String) arenas[j]),
 								    duration,
-								    (String) arenas[j]);
+								    (String) arenas[j],
+								    "tech"
+								    );
 			data.add(e);
+			System.out.print(i+" ");
 		    }
 		}
 	    }
 	}
-
+	System.out.println(" done techinput");
 	return status;
     }
 
@@ -141,12 +156,12 @@ public class TimeScheduleTable {
 	String arenas = "";
 	String events = "";
 
-  String result = START;
+	String result = START;
 
 	for(int i=0; i<this.data.size()-1; i++) {
-	    if(!data.get(i).sameEvent(data.get(i+1))) {
+	    // if(!data.get(i).sameEvent(data.get(i+1))) {
 		result = result+data.get(i).toJSON()+SEP;
-	    }
+		//}
 	}
 	result = result+data.get(this.data.size()-1).toJSON()+END;
 
@@ -169,7 +184,7 @@ public class TimeScheduleTable {
 		    if(rowi.getKlass().equals(rowj.getKlass())) {
 			//System.out.println("comparing: "+rowi+"  "+rowj);
 			if(rowi.overlap(rowj)) {
-			    abnormal.add(rowi);
+			    abnormal.add(rowi+ " overlaps with "+rowj);
 			    System.out.println("not ok: "+rowi+" overlaps with "+rowj);
 			    response = false;
 			}
@@ -178,7 +193,7 @@ public class TimeScheduleTable {
 	    }
 	}
 
-	System.out.println("Health :\n"+abnormal.toString());
+	//System.out.println("Health :\n"+abnormal.toString());
 	return response;
     }
 
@@ -187,54 +202,41 @@ public class TimeScheduleTable {
 	DataLoader dl = new DataLoader();
 	TimeScheduleTable ts = new TimeScheduleTable();
 
-/*
-	// Orginalarket
-	String spreadsheetId = "1YgIgo1cpksh5ZklpVy6J3A46mBmgKJe-ix56f_n4Mzw";
-	//Katrins LABs version
-	//String spreadsheetId = "1bEus2c9lQzqlXD3jjqXbHEkYulWfaken4AQYX_F3gSw";
-	String runDataRangeL = "2018 Tidsprogram Lör!A5:F34";
-	String runDataRangeS = "2018 Tidsprogram Sön!A7:F32";
-	String techDataRangeL = "2018 Tidsprogram Lör!G3:M32";
-	String techDataRangeS = "2018 Tidsprogram Sön!G3:K33";
+	/*
+	//Version 2
+	//String spreadsheetId = "11i9JCTsDwCnt3mZgRzMnbc7gr4DAJWUzH84aolhU-2c";
+	    
+	//Version 1
+	//String spreadsheetId = "1zpA79kBJSWau0pPpo5ZH9ieEcvqvkD2vAnVQ3lV14fo";
+	String runDataRangeL = "2019 Tidsprogram Lör!A5:F34";
+	String techDataRangeL = "2019 Tidsprogram Lör!G3:M31";
+	String runDataRangeS = "2019 Tidsprogram Sön!A7:F32";
+	String techDataRangeS = "2019 Tidsprogram Sön!G3:K32";
+	*/
+	
+	//Version 4
+	String spreadsheetId = "1a-ErSSoU6Qd5LQRxJB08NQCn4yfSYuUl0pOjFbf-oPc";
+	String runDataRangeL = "2019 Tidsprogram Lör!A5:F34";
+	String techDataRangeL = "2019 Tidsprogram Lör!G3:M31";
+	String runDataRangeS = "2019 Tidsprogram Sön!A7:F32";
+	String techDataRangeS = "2019 Tidsprogram Sön!G3:K32";
 
-  try {
-      ts.importRunData("lördag", dl.getData(spreadsheetId, runDataRangeL));
-      ts.importRunData("söndag", dl.getData(spreadsheetId, runDataRangeS));
-      ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeL));
-      ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeS));
-  } catch (IOException e) {
-      System.err.println("Unable to getData.");
-  }
-*/
 
-  // SAYO Outdoor 2019
-  String spreadsheetId = "1t1wx-Z743j8D83Acsl4XLswz3yJz-dYMtWTudK9X-nw";
-
-  String runDataRangeF = "Fredag 2019!A7:F18";
-  String runDataRangeL = "Lördag 2019!A3:F52";
-  String runDataRangeS = "Söndag 2019!A4:F36";
-  String techDataRangeF = "Fredag 2019!H2:N15";
-  String techDataRangeLv = "Lördag 2019!H2:O55";
-  String techDataRangeLs = "Lördag 2019!R2:S39";
-  String techDataRangeSv = "Söndag 2019!H2:M40";
-  String techDataRangeSs = "Söndag 2019!O2:P38";
+	
 
 	try {
-      ts.importRunData("fredag", dl.getData(spreadsheetId, runDataRangeF));
 	    ts.importRunData("lördag", dl.getData(spreadsheetId, runDataRangeL));
 	    ts.importRunData("söndag", dl.getData(spreadsheetId, runDataRangeS));
-      ts.importTechData("fredag", dl.getData(spreadsheetId, techDataRangeF));
-	    ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeLv));
-      ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeLs));
-	    ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeSv));
-      ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeSs));
+	    ts.importTechData("lördag", dl.getData(spreadsheetId, techDataRangeL));
+	    ts.importTechData("söndag", dl.getData(spreadsheetId, techDataRangeS));
 	} catch (IOException e) {
-	    System.err.println("Unable to getData.");
+	    System.err.println("Unable to getData."+e);
 	}
 
 	ts.sort();
 	System.out.println(ts.toString());
 
+	//ts.printCVS();
 	ts.printJSON();
 
 	System.out.println(ts.healthCheck());
